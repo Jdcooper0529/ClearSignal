@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>ClearSignal prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef1f4;--card:#fff;--ink:#14212e;--mute:#5b6b7a;--line:#d5dce3;--acc:#0b5c75;--l1:#6b8a9c;--l2:#b88a00;--l3:#d9731a;--l5:#c4262e;--ai:#e6f3f7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1820;--card:#17232e;--ink:#e6edf3;--mute:#9bacbb;--line:#2b3b49;--acc:#5cc2de;--ai:#12303b}}
+:root[data-theme="dark"]{--bg:#0f1820;--card:#17232e;--ink:#e6edf3;--mute:#9bacbb;--line:#2b3b49;--acc:#5cc2de;--ai:#12303b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*:before,*:after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+.banner{background:var(--ink);color:var(--bg);padding:6px 16px;font-size:12.5px}
+.wrap{display:flex;min-height:calc(100vh - 30px)}
+nav{width:215px;flex:none;border-right:1px solid var(--line);padding:14px 8px;background:var(--card)}
+nav h1{font-size:18px;margin:0 8px 2px}nav p{margin:0 8px 12px;font-size:12px;color:var(--mute)}
+nav button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:8px;border-radius:6px;font:inherit;font-size:13.5px;cursor:pointer}
+nav button.on{background:var(--ai);color:var(--acc);font-weight:600}
+main{flex:1;padding:20px;max-width:960px;min-width:0}
+h2{margin:0 0 4px;font-size:21px}.sub{color:var(--mute);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}
+.ai{background:var(--ai);border-left:4px solid var(--acc);border-radius:4px;padding:10px 12px;margin:0 0 14px;font-size:13.5px}
+.ai b{color:var(--acc)}
+.pill{display:inline-block;color:#fff;border-radius:10px;padding:1px 9px;font-size:12px;font-weight:600;white-space:nowrap}
+.L1{background:var(--l1)}.L2{background:var(--l2)}.L3{background:var(--l3)}.L4,.L5{background:var(--l5)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--card)}.stat b{font-size:24px;display:block}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+button.btn,select,input,textarea{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 11px}
+button.btn{cursor:pointer;background:var(--acc);color:#fff;border-color:var(--acc);font-weight:500}
+:root:not([data-theme="light"]) button.btn{color:#0f1820}
+button.btn.sec{background:var(--card);color:var(--ink);border-color:var(--line)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{text-align:left;padding:7px 6px;border-top:1px solid var(--line);vertical-align:top}
+.tbl tr.c{cursor:pointer}.tbl tr.c:hover{background:var(--ai)}
+.scroll{overflow-x:auto}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.muted{color:var(--mute)}.gray{opacity:.7}
+.tag{border:1px solid var(--line);border-radius:4px;padding:0 6px;font-size:12px;margin-right:4px;display:inline-block}
+.hide{display:none}
+.bar{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:4px 0}.bar i{display:block;height:14px;border-radius:3px;background:var(--acc)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.steps span{border:1px solid var(--line);border-radius:12px;padding:2px 10px;font-size:12.5px}.steps .d{background:var(--acc);color:#fff;border-color:var(--acc)}
+:root:not([data-theme="light"]) .steps .d{color:#0f1820}
+@media(max-width:700px){.wrap{display:block}nav{width:auto;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}nav h1,nav p{display:none}nav button{white-space:nowrap;width:auto}main{padding:14px}}
+</style></head><body>
+<div class="banner">Prototype with synthetic data. All stores, customers and complaints are fictional, and the AI outputs are simulated to show the workflow.</div>
+<div class="wrap"><nav id="nav"><h1>ClearSignal</h1><p>AI flags. People decide.</p></nav><main id="m"></main></div>
+<script>
+const S=["Signal Dashboard","Complaint Feed","Complaint Scoring","Critical Case Review","Pattern Alert","Evidence Board","Decision and Routing","Resolution Tracker"];
+const C=[
+{id:"C-2041",st:"042",ch:"App",cat:"Store equipment",lv:1,own:"Store manager",tx:"The shopping cart by the door has a wobbly wheel and keeps veering left."},
+{id:"C-2188",st:"027",ch:"Call center",cat:"Empty shelves",lv:2,own:"District manager",tx:"Third time this week there is no milk or yogurt at 6pm."},
+{id:"C-2260",st:"031",ch:"Email",cat:"Code date",lv:3,own:"Fresh dept + vendor",tx:"Yogurt I bought was expired by 4 days. Lot printed on lid."},
+{id:"C-2301",st:"061",ch:"Service desk",cat:"Service (deli)",lv:3,own:"Regional ops + HR",tx:"Waited 25 minutes at deli after 6pm, no one was behind the counter.",tg:"Merged duplicate"},
+{id:"C-2355",st:"064",ch:"App",cat:"Service (deli)",lv:3,own:"Regional ops + HR",tx:"Nadie atendio en la charcuteria por 20 minutos en la noche.",tg:"Spanish"},
+{id:"C-2490",st:"118",ch:"Social media",cat:"Safety, code date",lv:5,own:"Executive + crisis team",tx:"Gave my baby formula that was past its date and now she is vomiting. Posting this so others check.",tg:"Public post"},
+{id:"C-2502",st:"119",ch:"Call center",cat:"Code date",lv:4,own:"Food safety",tx:"Infant formula at your store expired last month. Code date missing from my receipt.",tg:"Missing details"}];
+let lvF="all",sel=null,feedF="all",staff=false,sim=false,done=false;
+const $=s=>document.querySelector(s),pill=l=>`<span class="pill L${l}">Level ${l}</span>`;
+const ai=t=>`<div class="ai"><b>What the AI is doing:</b> ${t}</div>`;
+function go(i){cur=i;render()}let cur=0;
+function nav(){$("#nav").querySelectorAll("button").forEach(b=>b.remove());S.forEach((n,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+n;if(i==cur)b.className="on";b.onclick=()=>go(i);$("#nav").appendChild(b)})}
+const V=[
+()=>{const A=[[5,"Expired infant formula, Store 118","1 hour to act",3],[3,"Evening deli service, District 6","9 complaints, 5 stores",4],[3,"Expired yogurt, District 3","4 stores in 10 days",null],[2,"Empty dairy shelves, Store 027","6 complaints in a week",null]];
+const f=A.filter(a=>lvF=="all"||a[0]==lvF);
+return `<h2>Signal Dashboard</h2><p class="sub">Dana's daily view: 180 stores, April to September 2026</p>${ai("Compares each store's complaint rate with its normal level, adjusted for traffic, and groups complaints that describe the same problem.")}
+<div class="grid"><div class="stat"><b>1</b>Level 5 open</div><div class="stat"><b>2</b>Level 3 open</div><div class="stat"><b>1</b>Level 2 open</div><div class="stat"><b>2</b>Overdue</div></div><br>
+<div class="card"><div class="row"><b>Active alerts</b><label>Filter <select onchange="lvF=this.value;render()"><option value="all">All levels</option>${[5,3,2].map(l=>`<option value="${l}" ${lvF==l?"selected":""}>Level ${l}</option>`).join("")}</select></label></div>
+${f.map(a=>`<div class="row">${pill(a[0])}<span style="flex:1">${a[1]}<br><span class="muted">${a[2]}</span></span><button class="btn sec" onclick="go(${a[3]??1})">Open</button></div>`).join("")||'<p class="muted">No alerts at this level.</p>'}
+<div class="row gray"><span class="pill" style="background:var(--l1)">No alert</span><span style="flex:1">Beverage and frozen complaints up June to August<br><span class="muted">Within normal rate once adjusted for summer store traffic</span></span></div></div>
+<button class="btn" onclick="go(1)">Open complaint feed</button>`},
+()=>{const f=C.filter(c=>feedF=="all"||c.lv==feedF);const c=C.find(x=>x.id==sel);
+return `<h2>Complaint Feed</h2><p class="sub">Every channel in one record</p>${ai("Reads free text (including Spanish), extracts store, department, product and code date, tags the category, merges duplicates and suggests a level.")}
+<div class="card"><label>Level <select onchange="feedF=this.value;render()"><option value="all">All</option>${[1,2,3,4,5].map(l=>`<option value="${l}" ${feedF==l?"selected":""}>${l}</option>`).join("")}</select></label>
+<div class="scroll"><table class="tbl"><tr><th>ID</th><th>Store</th><th>Channel</th><th>Category</th><th>Level</th><th>Labels</th></tr>${f.map(c=>`<tr class="c" onclick="sel='${c.id}';render()"><td>${c.id}</td><td>${c.st}</td><td>${c.ch}</td><td>${c.cat}</td><td>${pill(c.lv)}</td><td>${c.tg?`<span class="tag">${c.tg}</span>`:""}</td></tr>`).join("")}</table></div></div>
+${c?`<div class="two"><div class="card"><b>Original text</b><p>"${c.tx}"</p><span class="muted">${c.ch}, Store ${c.st}</span></div><div class="card"><b>AI tags</b><p><span class="tag">${c.cat}</span>${c.tg?`<span class="tag">${c.tg}</span>`:""}</p><p>${pill(c.lv)} routed to ${c.own}</p><button class="btn sec">Confirm</button> <button class="btn sec">Correct</button></div></div>`:'<p class="muted">Select a complaint to compare the original text with its tags.</p>'}`},
+()=>`<h2>Complaint Scoring</h2><p class="sub">Why a wobbly cart and expired infant formula are never treated alike</p>${ai("Detects risk and impact signals in the text, then the company's rules set the final level. The score is explained, not hidden.")}
+<div class="two">${[[1,1,1,"Wobbly cart, Store 042","Store manager, 48 hours","Equipment issue; no injury; no safety terms",""],[5,5,5,"Expired infant formula, Store 118","Executive and crisis team, 1 hour","Mentions a child; possible illness; expired infant formula; public post","Mandatory trigger: possible illness. Rule sets Level 5 regardless of other scores."]].map((x,i)=>`<div class="card"><b>${x[3]}</b><p>Risk <b>${x[1]}</b> / Impact <b>${x[2]}</b> ${pill(x[0])}</p><p class="muted">${x[4]}</p><button class="btn sec" onclick="document.getElementById('sc${i}').classList.toggle('hide')">How was this scored?</button><div id="sc${i}" class="hide"><p><b>Signals detected:</b> ${x[5]}</p><p><b>Rule applied:</b> ${x[6]||"No mandatory trigger. Standard Level 1 routing."}</p></div></div>`).join("")}</div>`,
+()=>`<h2>Critical Case Review</h2><p class="sub">Expired infant formula, Store 118. Locked to Food Safety, Risk, Legal and Communications.</p>${ai("Recommends immediate actions from the company's playbook and finds a similar complaint nearby. It cannot close or downgrade this case.")}
+<div class="card"><b>Immediate actions</b>${["Pull and hold the product","Run chain-wide code-date check","Contact family with approved script","Issue holding statement","Place legal hold"].map(t=>`<label class="row" style="display:flex;justify-content:flex-start"><input type="checkbox"> ${t}</label>`).join("")}</div>
+<div class="card"><b>Similar complaint:</b> Store 119, code date missing on infant formula (Level 4). Same product category, 2 miles away.</div>
+<div class="card"><button class="btn" onclick="this.textContent='Assigned: Food Safety lead';this.disabled=true">Assign trained reviewer</button> <button class="btn sec" disabled>Close</button> <button class="btn sec" disabled>Downgrade</button><p class="muted">Close and Downgrade are disabled by design. Only a trained reviewer can change a Level 4 or 5 case.</p></div>`,
+()=>`<h2>Pattern Alert: evening deli service</h2><p class="sub">District 6 &middot; Level 3 &middot; Confidence: medium-high</p>${ai("Clustering groups 9 differently worded complaints into one issue. Anomaly detection shows the volume is far above these stores' normal.")}
+<div class="card"><p><b>Summary (AI-drafted):</b> Nine complaints in three weeks at five District 6 stores describe long waits and no associate at the deli after 6pm. These stores normally receive about one such complaint per month.</p>
+<div class="bar">This pattern <i style="width:270px"></i> 9</div><div class="bar">Normal <i style="width:30px"></i> ~1</div>
+<button class="btn sec" onclick="document.getElementById('why').classList.toggle('hide')">Why this alert?</button>
+<div id="why" class="hide"><p><b>Thresholds met:</b> at least 5 complaints; at least 3 stores; rate above 3x normal after traffic adjustment.<br><b>Data used:</b> complaint text, store traffic, deli staffing totals by hour. No associate names are used.</p></div></div><button class="btn" onclick="go(5)">View evidence</button>`,
+()=>`<h2>Evidence Board</h2><p class="sub">Evening deli service, District 6</p>${ai("Pulls related operations data and finds a similar past incident so the leader can check the cause, not just the symptom.")}
+<div class="two"><div class="card"><b>Timeline</b>${["Sep 1 Store 061","Sep 4 Store 063","Sep 8 Store 064 (Spanish)","Sep 11 Store 061","Sep 14 Store 066","Sep 17 Store 064","Sep 19 Store 068","Sep 21 Store 063","Sep 22 Store 066"].map(t=>`<div class="row" style="padding:4px 0">${t}</div>`).join("")}</div>
+<div class="card"><b>Stores affected</b><p>061, 063, 064, 066, 068 (of 20 in District 6)</p><b>Quoted excerpts</b><p class="muted">"No one behind the counter after 6." "Waited 25 minutes." "Nadie atendio."</p><label><input type="checkbox" ${staff?"checked":""} onchange="staff=this.checked;render()"> Show evening deli staffing overlay</label>
+${staff?`<div class="bar">District 6 <i style="width:60px"></i> 14 hrs/week</div><div class="bar">Other districts <i style="width:130px"></i> 31 hrs/week</div><p class="muted">Department totals only.</p>`:""}</div></div>
+<div class="card"><b>Similar past incident:</b> Evening bakery waits, District 2. Cause: schedule cut. Action: restored one evening shift. Complaints dropped 70% in 30 days. <button class="btn sec" onclick="this.nextElementSibling.classList.toggle('hide')">Compare</button><p class="hide muted">Same pattern shape: staffing drop, then service complaints concentrated in evenings.</p></div>`,
+()=>`<h2>Decision and Routing</h2><p class="sub">A person makes the call</p>${ai("Recommends an owner and next step, and drafts an internal notice. You can change anything, and a reason is required.")}
+<div class="card"><label>Owner <select id="ow"><option>Regional operations + HR training partner</option><option>District 6 manager only</option><option>Store managers (5 stores)</option></select></label><p>Suggested next step: review evening deli scheduling and hold refresher training. Action plan due in 3 business days.</p>
+<b>Drafted internal notice</b><p class="muted">"Five District 6 stores show a rise in evening deli wait complaints. Please review scheduling and report an action plan by Friday."</p>
+<label>Reason (required)<br><textarea id="rs" rows="2" style="width:100%" oninput="$('#ap').disabled=!this.value.trim()"></textarea></label><p><button class="btn" id="ap" disabled onclick="$('#lg').classList.remove('hide');setTimeout(()=>go(7),900)">Approve and log decision</button></p><p id="lg" class="hide"><b>Logged:</b> owner, next step, reason, approver and timestamp saved to the audit trail.</p></div>`,
+()=>`<h2>Resolution Tracker</h2><p class="sub">An issue is resolved when complaints drop, not when the ticket closes</p>${ai("Tracks whether related complaints decline after the fix and compares post-resolution satisfaction with baseline.")}
+<div class="steps">${["Detected","Assigned","Action taken","Monitoring","Resolved"].map((s,i)=>`<span class="${i<(done?5:sim?4:3)?"d":""}">${s}</span>`).join("")}</div>
+<div class="card">Action taken: evening deli shift added at 5 stores; refresher training held.<p><button class="btn" ${sim?"disabled":""} onclick="sim=true;render()">Simulate 30-day follow-up</button></p>
+${sim?`<b>Deli complaints, 5 stores (simulated)</b>${[["Week -3",9],["Week -2",8],["Week 0 (fix)",6],["Week +2",3],["Week +4",1]].map(w=>`<div class="bar" style="width:100%">${w[0]} <i style="width:${w[1]*28}px"></i> ${w[1]}</div>`).join("")}<p>Post-resolution satisfaction: 72 (simulated), up from a baseline of 61.</p><button class="btn" ${done?"disabled":""} onclick="done=true;render()">Mark resolved</button>`:""}
+${done?`<p><b>Resolved.</b> <button class="btn sec" onclick="go(0)">Return to dashboard</button></p>`:""}</div>`];
+function render(){nav();$("#m").innerHTML=V[cur]();window.scrollTo(0,0)}
+render();
+</script></body></html>
